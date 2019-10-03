@@ -1,22 +1,48 @@
-### Identify vertices with only or almost zero values
+### Amadou Barry
+### Date October 3, 2019
+### Goal: Identify vertices with zeros or almost zeros
 ### 
 rm(list = ls())
 
 ### Upload packages
 library('data.table')
-### Upload dataset
-df_rh = fread('/home/amadou/projects/rpp-aevans-ab/mni_data_sharing/nonzero_cortical_data/abide_fs60_vout_fwhm0_rh_SubjectIDFormatted_N1050_nonzero_withSEX.csv',header=TRUE)
+### ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ ###
+### Upload dataset right hemisphere
+df_rh = fread('~/projects/rpp-aevans-ab/mni_data_sharing/nonzero_cortical_data/abide_fs60_vout_fwhm0_rh_SubjectIDFormatted_N1050_nonzero_withSEX.csv',header=TRUE)
+### ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ ###
 ### colnames
-cname = colnames(df_rh)
-head(cname) #  "V1"  "SUB_ID" "0"  "1"  "2"  "3"
-tail(cname) #  "163839"  163840"  "163841"  "AGE_AT_SCAN" "SEX" "DX_GROUP"
+cname_rh = colnames(df_rh)
+head(cname_rh) #  "V1"  "SUB_ID" "0"  "1"  "2"  "3"
+tail(cname_rh) #  "163839"  163840"  "163841"  "AGE_AT_SCAN" "SEX" "DX_GROUP"
 
 ### Subset the dataset to keep only the vertices
-mat_vertex = as.matrix(subset(df_rh, select=-c(V1,SUB_ID,AGE_AT_SCAN,SEX,DX_GROUP)))
-dim(mat_vertex) # 1050 149926
+mat_vertex_rh = as.matrix(subset(df_rh, select=-c(V1,SUB_ID,AGE_AT_SCAN,SEX,DX_GROUP)))
+dim(mat_vertex_rh) # 1050 149926
 ### Find vertices filled with zero
-sum_vertex = apply(mat_vertex,2,sum)
-zero_vertex = which(sum_vertex==0) # length(zero_vertex) = 0
+sum_vertex_rh = apply(mat_vertex_rh,2,sum)
+zero_vertex_rh = which(sum_vertex_rh==0) # length(zero_vertex_rh) = 0
 ### Find vertices with almost zero values
-standardize_zero_vertex = apply(mat_vertex,2,function(y){sum((y-median(y))/mad(y))})
-nan_vertex = which(is.nan(standardize_zero_vertex)) # length(nan_vertex) = 151
+standardize_zero_vertex_rh = apply(mat_vertex_rh,2,function(y){sum((y-median(y))/mad(y))})
+nan_vertex_rh = which(is.nan(standardize_zero_vertex_rh)) # length(nan_vertex_rh) = 151
+write.table(data.frame(nan_vertex_rh=nan_vertex_rh),file='~/projects/rpp-aevans-ab/mni_data_sharing/nonzero_cortical_data/out_vertex_with_many_zero_rh.csv', sep=",", row.names=FALSE)
+
+### ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ ###
+### Upload dataset right hemisphere
+df_lh = fread('~/projects/rpp-aevans-ab/mni_data_sharing/nonzero_cortical_data/abide_fs60_vout_fwhm0_lh_SubjectIDFormatted_N1050_nonzero_withSEX.csv', header=TRUE)
+### ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ ###
+### colnames
+cname_lh = colnames(df_lh)
+head(cname_lh) #  "V1"  "SUB_ID" "0"  "1"  "2"  "3"
+tail(cname_lh) #  "163839"  163840"  "163841"  "AGE_AT_SCAN" "SEX" "DX_GROUP"
+### Subset the dataset to keep only the vertices
+mat_vertex_lh = as.matrix(subset(df_lh, select=-c(V1,SUB_ID,AGE_AT_SCAN,SEX,DX_GROUP)))
+dim(mat_vertex_lh) # 1050 149955
+### Find vertices filled with zero
+sum_vertex_lh = apply(mat_vertex_lh,2,sum)
+zero_vertex_lh = which(sum_vertex_lh==0) # length(zero_vertex_lh) = 0
+### Find vertices with almost zero values
+standardize_zero_vertex_lh = apply(mat_vertex_lh,2,function(y){sum((y-median(y))/mad(y))})
+nan_vertex_lh = which(is.nan(standardize_zero_vertex_lh)) # length(nan_vertex_lh) = 157
+write.table(data.frame(nan_vertex_lh=nan_vertex_lh),file='~/projects/rpp-aevans-ab/mni_data_sharing/nonzero_cortical_data/out_vertex_with_many_zero_lh.csv', sep=",", row.names=FALSE)
+### End
+### Summary: There is 151 vertices with at least 50% zeros in the right hemis. and 157 in the left hemis.
