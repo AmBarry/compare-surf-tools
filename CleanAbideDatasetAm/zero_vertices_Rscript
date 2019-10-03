@@ -1,1 +1,22 @@
 ### Identify vertices with only or almost zero values
+### 
+rm(list = ls())
+
+### Upload packages
+library('data.table')
+### Upload dataset
+df_rh = fread('/home/amadou/projects/rpp-aevans-ab/mni_data_sharing/nonzero_cortical_data/abide_fs60_vout_fwhm0_rh_SubjectIDFormatted_N1050_nonzero_withSEX.csv',header=TRUE)
+### colnames
+cname = colnames(df_rh)
+head(cname) #  "V1"  "SUB_ID" "0"  "1"  "2"  "3"
+tail(cname) #  "163839"  163840"  "163841"  "AGE_AT_SCAN" "SEX" "DX_GROUP"
+
+### Subset the dataset to keep only the vertices
+mat_vertex = as.matrix(subset(df_rh, select=-c(V1,SUB_ID,AGE_AT_SCAN,SEX,DX_GROUP)))
+dim(mat_vertex) # 1050 149926
+### Find vertices filled with zero
+sum_vertex = apply(mat_vertex,2,sum)
+zero_vertex = which(sum_vertex==0) # length(zero_vertex) = 0
+### Find vertices with almost zero values
+standardize_zero_vertex = apply(mat_vertex,2,function(y){sum((y-median(y))/mad(y))})
+nan_vertex = which(is.nan(standardize_zero_vertex)) # length(nan_vertex) = 151
